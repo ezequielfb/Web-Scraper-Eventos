@@ -69,7 +69,7 @@ Coletar shows e eventos do Sympla (ou qualquer site de estrutura similar), class
 
 ### Pré-requisitos
 
-- Docker instalado (incluindo Docker Compose, dispensavel se não quiser usa BD)
+- Docker instalado (incluindo Docker Compose, dispensavel se não quiser usar BD)
 - Git para clonar o repositório
 
 ### Passos
