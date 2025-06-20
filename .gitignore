@@ -6,7 +6,7 @@ logs/
 .env
 __pycache__/
 *.pyc
-*.sqlite3 # Se ainda tiver o antigo DB localmente, garante que não suba
-*.db      # Para qualquer arquivo .db
-.DS_Store # macOS
-Thumbs.db # Windows
+*.sqlite3
+*.db
+.DS_Store
+Thumbs.db

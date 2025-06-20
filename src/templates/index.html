@@ -115,4 +115,138 @@
     {% else %}
     <p>Nenhum evento encontrado com os filtros aplicados.</p>
     {% endif %}
+
+    <div id="event-popout">
+        <button class="popout-close-btn">&times;</button>
+        <div class="popout-content"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventCards = document.querySelectorAll('.event-card');
+            const eventPopout = document.getElementById('event-popout');
+            const popoutContent = eventPopout.querySelector('.popout-content');
+            const closeBtn = eventPopout.querySelector('.popout-close-btn');
+
+            let hidePopoutTimeout; // Para controlar o atraso para esconder
+            let showPopoutTimeout; // Para controlar o atraso para mostrar (evitar flicker de entrada)
+            let activeCard = null; // Para rastrear qual card está ativo no hover
+
+            // Função para calcular a altura total de um elemento sem overflow
+            function getFullContentHeight(element) {
+                const clone = element.cloneNode(true); 
+                clone.style.cssText = 'position: absolute; visibility: hidden; height: auto; max-height: none; overflow: visible; width: ' + element.offsetWidth + 'px;';
+                document.body.appendChild(clone); 
+                const height = clone.offsetHeight; 
+                document.body.removeChild(clone); 
+                return height;
+            }
+
+            eventCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    clearTimeout(hidePopoutTimeout); // Cancela o hide se o mouse entrar novamente
+                    clearTimeout(showPopoutTimeout); // Cancela o show anterior se entrar rápido
+
+                    const currentCard = this; // O card atual sendo hoverado
+                    activeCard = currentCard; // Define o card atual como ativo
+
+                    console.log('Mouse entered card:', currentCard.querySelector('h3').textContent.trim());
+                    
+                    // Atraso para mostrar, evita "flicker" ao passar rapidamente
+                    showPopoutTimeout = setTimeout(() => {
+                        if (activeCard !== currentCard) {
+                            console.log('Mouse moved to another card before showPopoutTimeout, returning.');
+                            return; // Se o mouse já mudou de card, não faça nada
+                        }
+                        console.log('Showing popout for:', currentCard.querySelector('h3').textContent.trim());
+
+                        // Limpa o conteúdo anterior
+                        popoutContent.innerHTML = '';
+                        
+                        // Clona o conteúdo completo do card original para o pop-out
+                        const clonedCard = currentCard.cloneNode(true);
+                        // Remove estilos do card clonado que podem interferir no pop-out
+                        clonedCard.style.cssText = 'height: auto; overflow: visible; box-shadow: none; border: none; padding: 0; margin: 0;';
+                        
+                        // Adiciona o clone ao pop-out
+                        popoutContent.appendChild(clonedCard);
+
+                        // Calcula a altura real do conteúdo para o pop-out
+                        const fullHeight = getFullContentHeight(currentCard);
+
+                        // Pega a posição e dimensão do card original (agora no DOM atual)
+                        const originalRect = currentCard.getBoundingClientRect(); 
+
+                        console.log('Original card rect (viewport):', originalRect);
+                        console.log('Full content height:', fullHeight);
+                        console.log('Window scrollY:', window.scrollY);
+
+                        // --- MUDANÇA CRÍTICA AQUI: Usar originalRect.top/left DIRETAMENTE para position: fixed ---
+                        eventPopout.style.top = originalRect.top + 'px'; // Não adicionar window.scrollY
+                        eventPopout.style.left = originalRect.left + 'px'; // Não adicionar window.scrollX
+                        eventPopout.style.width = originalRect.width + 'px'; // Largura inicial
+                        eventPopout.style.height = originalRect.height + 'px'; // Altura inicial
+                        eventPopout.style.transform = 'scale(1)'; // Inicia sem escala
+
+                        // Torna o pop-out visível
+                        eventPopout.classList.add('visible');
+
+                        // Anima o pop-out para sua altura final e com o efeito balão
+                        setTimeout(() => {
+                            eventPopout.style.height = fullHeight + 'px';
+                            eventPopout.style.width = (originalRect.width * 1.02) + 'px'; // Expande a largura levemente (ajuste)
+                            eventPopout.style.transform = 'scale(1.01)'; // Efeito balão mais sutil (ajuste)
+                            eventPopout.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.4)'; // Sombra mais forte
+                            console.log('Popout final height set to:', eventPopout.style.height);
+                        }, 50); // Pequeno atraso para iniciar a animação
+                    }, 200); // Atraso principal para mostrar o pop-out (evitar flickering rápido)
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    clearTimeout(showPopoutTimeout); // Cancela o show se o mouse sair antes do atraso
+                    activeCard = null; // Reseta o card ativo imediatamente ao sair
+
+                    // Adiciona um pequeno atraso para esconder, evitando desaparecimento rápido
+                    hidePopoutTimeout = setTimeout(() => {
+                        console.log('Mouse left card, hiding popout.');
+                        eventPopout.classList.remove('visible');
+                        // Resetar estilos do pop-out para a próxima vez que aparecer
+                        eventPopout.style.height = ''; 
+                        eventPopout.style.width = '';
+                        eventPopout.style.transform = '';
+                        eventPopout.style.boxShadow = '';
+                    }, 300); // Esconde após 300ms
+                });
+            });
+
+            // Permite que o pop-out não desapareça se o mouse entrar nele
+            eventPopout.addEventListener('mouseenter', function() {
+                console.log('Mouse entered popout, clearing hide timeout.');
+                clearTimeout(hidePopoutTimeout);
+            });
+
+            // Esconde o pop-out quando o mouse sai dele
+            eventPopout.addEventListener('mouseleave', function() {
+                console.log('Mouse left popout, hiding popout with delay.');
+                hidePopoutTimeout = setTimeout(() => {
+                    eventPopout.classList.remove('visible');
+                    eventPopout.style.height = ''; 
+                    eventPopout.style.width = '';
+                    eventPopout.style.transform = '';
+                    eventPopout.style.boxShadow = '';
+                }, 300);
+            });
+
+            // Esconde o pop-out quando o botão de fechar é clicado
+            closeBtn.addEventListener('click', function() {
+                console.log('Close button clicked, hiding popout.');
+                eventPopout.classList.remove('visible');
+                eventPopout.style.height = ''; 
+                eventPopout.style.width = '';
+                eventPopout.style.transform = '';
+                eventPopout.style.boxShadow = '';
+                activeCard = null; // Reseta o card ativo
+            });
+        });
+    </script>
 {% endblock %}

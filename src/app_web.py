@@ -1,9 +1,9 @@
 # src/app_web.py
 from flask import Flask, render_template, request, redirect, url_for
 from .db import Database
-from .utils import setup_logging, logger # Importe o logger para usar aqui também
+from .utils import setup_logging, logger
 import os
-from datetime import datetime # <-- MUDANÇA: Importar datetime
+from datetime import datetime
 
 # Inicializa o logger para a aplicação web
 setup_logging()

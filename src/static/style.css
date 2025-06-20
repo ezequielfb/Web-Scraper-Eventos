@@ -119,7 +119,8 @@ hr {
 .event-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 20px; 
+    align-items: start; /* Mantido para que cards não estiquem internamente */
 }
 
 .event-card {
@@ -128,55 +129,108 @@ hr {
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease;
+    transition: box-shadow 0.3s ease; /* Manter transição para sombra */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start; /* Alinha o conteúdo ao topo */
+    position: relative; /* Para z-index e context */
+    z-index: 1; /* Nível padrão */
+
+    /* Altura fixa e esconder conteúdo */
+    height: 350px; /* Altura fixa para o card (ajuste conforme necessário) */
+    overflow: hidden; /* Esconde o conteúdo que excede a altura por padrão */
+    cursor: pointer; /* Indica que é clicável/interativo */
 }
 
 .event-card:hover {
-    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* Sombra mais pronunciada no hover */
+    /* Nenhuma transição de transform ou height/max-height aqui, o pop-out fará isso */
+    z-index: 1; /* Não precisa de z-index alto no card, o pop-out terá o seu */
 }
 
-.event-card h3 {
-    margin-top: 0;
-    color: #007bff;
+/* Removido .event-card-fixed-content e .event-card-overflow-content do CSS,
+   pois os wrappers são apenas para a estrutura HTML */
+
+/* Estilos para o Pop-Out Global */
+#event-popout {
+    display: none; /* Escondido por padrão, JS vai mudar para 'block' */
+    position: fixed; /* Fixado na tela, não no fluxo do documento, para sobrepor tudo */
+    top: 0; /* Posição inicial (ajustada por JS) */
+    left: 0; /* Posição inicial (ajustada por JS) */
+    background-color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Garante que fique acima de tudo */
+    max-width: 400px; /* Largura máxima do pop-out */
+    min-width: 350px;
+    max-height: 80vh; /* Altura máxima da viewport */
+    overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
+    opacity: 0; /* Começa transparente */
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Transições para aparecer suavemente */
+    pointer-events: none; /* Permite clicar através dele quando transparente */
+}
+
+#event-popout.visible {
+    display: block; /* MUDANÇA: Torna-o visível */
+    opacity: 1; /* Torna-o opaco */
+    pointer-events: auto; /* Permite interagir com ele quando visível */
+    transform: scale(1); /* Garante que o balão não esteja escalado no início, ou escala aqui */
+}
+
+/* Estilos para o conteúdo clonado dentro do pop-out */
+#event-popout .event-card {
+    /* Remover estilos que não fazem sentido para um clone dentro de um pop-out */
+    box-shadow: none; /* Remove sombra do clone */
+    border: none; /* Remove borda do clone */
+    padding: 0; /* Ajusta padding do clone */
+    margin: 0; /* Ajusta margem do clone */
+    height: auto; /* Garante que o clone dentro do pop-out não tenha altura fixa */
+    overflow: visible; /* Garante que o clone dentro do pop-out mostre tudo */
+}
+
+
+.popout-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
     font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    z-index: 1001; /* Garante que o botão esteja acima do conteúdo do pop-out */
 }
 
-.event-card h3 a {
-    text-decoration: none;
+.popout-close-btn:hover {
     color: #007bff;
 }
 
-.event-card p {
-    margin: 5px 0;
-    font-size: 0.95rem;
+/* Estilos para o conteúdo dentro do popout-content, se você quiser estilizar o clone */
+#event-popout .popout-content h3 {
+    color: #007bff;
 }
-
-.event-card strong {
+#event-popout .popout-content p {
+    margin: 5px 0;
+}
+#event-popout .popout-content strong {
     color: #555;
 }
-
-.ticket-details {
+#event-popout .popout-content .ticket-details {
     margin-top: 15px;
     border-top: 1px dashed #eee;
     padding-top: 10px;
 }
-
-.ticket-details h4 {
-    margin-top: 0;
+#event-popout .popout-content .ticket-details h4 {
     color: #444;
-    font-size: 1.1rem;
 }
-
-.ticket-details ul {
+#event-popout .popout-content .ticket-details ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-
-.ticket-details ul li {
+#event-popout .popout-content .ticket-details ul li {
     background-color: #e9f7ff;
     padding: 8px 10px;
     border-radius: 4px;
@@ -185,9 +239,14 @@ hr {
     border: 1px solid #d0eaff;
 }
 
+
 /* Estilos para telas menores */
 @media (max-width: 768px) {
     .filter-form {
         grid-template-columns: 1fr;
+    }
+    #event-popout {
+        max-width: 90vw; /* Ajuste para pop-out em telas pequenas */
+        padding: 15px;
     }
 }
