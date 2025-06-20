@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  scraper_app: # Serviço para rodar o scraper (execução única)
+    build: .
+    env_file:
+      - .env
+    restart: "no" # O scraper deve rodar e parar, não reiniciar automaticamente
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    # Você rodará este serviço com: docker compose up scraper_app --build --abort-on-container-exit
+    # O CMD do Dockerfile é usado por padrão, que é 'flask run'.
+    # Para o scraper, você pode sobrescrevê-lo assim:
+    # command: ["python", "-m", "src.main"] 
+
+  web_interface: # Serviço para a interface web (rodando continuamente)
+    build: . # Usa a mesma imagem do Dockerfile
+    env_file:
+      - .env # Precisa das mesmas credenciais do DB
+    ports:
+      - "5000:5000" # Mapeia a porta 5000 do container para a porta 5000 do host
+    restart: unless-stopped # Tenta reiniciar se o container parar inesperadamente
+    volumes:
+      - ./src:/app/src # Mapeia o código fonte para desenvolvimento (opcional, mas bom)
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment: # Define variáveis de ambiente para o container
+      FLASK_APP: src.app_web # INFORMA AO FLASK ONDE ESTÁ SEU ARQUIVO DE APP
+    command: ["flask", "run", "--host", "0.0.0.0"] # Comando para iniciar o Flask aqui

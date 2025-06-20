@@ -1,0 +1,15 @@
+beautifulsoup4
+certifi
+charset-normalizer
+Flask
+idna
+itsdangerous
+Jinja2
+MarkupSafe
+psycopg2-binary
+python-dotenv
+requests
+soupsieve
+typing_extensions
+urllib3
+Werkzeug

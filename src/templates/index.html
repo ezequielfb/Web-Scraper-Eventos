@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Pesquisar Eventos{% endblock %}
+
+{% block content %}
+    <h2>Pesquisar Eventos</h2>
+    <form action="{{ url_for('index') }}" method="get" class="filter-form">
+        <div class="form-group">
+            <label for="city">Cidade:</label>
+            <input type="text" id="city" name="city" value="{{ current_filters.city }}">
+        </div>
+        <div class="form-group">
+            <label for="tipo_evento">Tipo de Evento:</label>
+            <select id="tipo_evento" name="tipo_evento">
+                <option value="">Todos</option>
+                <option value="Música" {% if current_filters.tipo_evento == 'Música' %}selected{% endif %}>Música</option>
+                <option value="Teatro" {% if current_filters.tipo_evento == 'Teatro' %}selected{% endif %}>Teatro</option>
+                <option value="Esporte" {% if current_filters.tipo_evento == 'Esporte' %}selected{% endif %}>Esporte</option>
+                <option value="Feira/Exposição" {% if current_filters.tipo_evento == 'Feira/Exposição' %}selected{% endif %}>Feira/Exposição</option>
+                <option value="Palestras/Cursos" {% if current_filters.tipo_evento == 'Palestras/Cursos' %}selected{% endif %}>Palestras/Cursos</option>
+                <option value="Infantil" {% if current_filters.tipo_evento == 'Infantil' %}selected{% endif %}>Infantil</option>
+                <option value="Gastronomia" {% if current_filters.tipo_evento == 'Gastronomia' %}selected{% endif %}>Gastronomia</option>
+                <option value="Dança" {% if current_filters.tipo_evento == 'Dança' %}selected{% endif %}>Dança</option>
+                <option value="Cinema" {% if current_filters.tipo_evento == 'Cinema' %}selected{% endif %}>Cinema</option>
+                <option value="Religioso/Espiritual" {% if current_filters.tipo_evento == 'Religioso/Espiritual' %}selected{% endif %}>Religioso/Espiritual</option>
+                <option value="Festas/Baladas" {% if current_filters.tipo_evento == 'Festas/Baladas' %}selected{% endif %}>Festas/Baladas</option>
+                <option value="Outros" {% if current_filters.tipo_evento == 'Outros' %}selected{% endif %}>Outros</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="genero_musical">Gênero Musical:</label>
+            <select id="genero_musical" name="genero_musical">
+                <option value="">Todos</option>
+                <option value="Rock" {% if current_filters.genero_musical == 'Rock' %}selected{% endif %}>Rock</option>
+                <option value="Pop" {% if current_filters.genero_musical == 'Pop' %}selected{% endif %}>Pop</option>
+                <option value="Sertanejo" {% if current_filters.genero_musical == 'Sertanejo' %}selected{% endif %}>Sertanejo</option>
+                <option value="Samba/Pagode" {% if current_filters.genero_musical == 'Samba/Pagode' %}selected{% endif %}>Samba/Pagode</option>
+                <option value="Eletrônica" {% if current_filters.genero_musical == 'Eletrônica' %}selected{% endif %}>Eletrônica</option>
+                <option value="MPB" {% if current_filters.genero_musical == 'MPB' %}selected{% endif %}>MPB</option>
+                <option value="Funk" {% if current_filters.genero_musical == 'Funk' %}selected{% endif %}>Funk</option>
+                <option value="Gospel" {% if current_filters.genero_musical == 'Gospel' %}selected{% endif %}>Gospel</option>
+                <option value="Clássica" {% if current_filters.genero_musical == 'Clássica' %}selected{% endif %}>Clássica</option>
+                <option value="Reggae" {% if current_filters.genero_musical == 'Reggae' %}selected{% endif %}>Reggae</option>
+                <option value="Forró" {% if current_filters.genero_musical == 'Forró' %}selected{% endif %}>Forró</option>
+                <option value="Hip Hop/Rap" {% if current_filters.genero_musical == 'Hip Hop/Rap' %}selected{% endif %}>Hip Hop/Rap</option>
+                <option value="Outro Musical" {% if current_filters.genero_musical == 'Outro Musical' %}selected{% endif %}>Outro Musical</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="min_preco">Preço Mínimo:</label>
+            <input type="number" step="0.01" id="min_preco" name="min_preco" value="{{ current_filters.min_preco }}">
+        </div>
+        <div class="form-group">
+            <label for="max_preco">Preço Máximo:</label>
+            <input type="number" step="0.01" id="max_preco" name="max_preco" value="{{ current_filters.max_preco }}">
+        </div>
+        <div class="form-group">
+            <label for="start_date">Data Inicial:</label>
+            <input type="date" id="start_date" name="start_date" value="{{ current_filters.start_date }}">
+        </div>
+        <div class="form-group">
+            <label for="end_date">Data Final:</label>
+            <input type="date" id="end_date" name="end_date" value="{{ current_filters.end_date }}">
+        </div>
+        <div class="form-group">
+            <label for="order_by">Ordenar por:</label>
+            <select id="order_by" name="order_by">
+                <option value="data_evento_inicio" {% if current_filters.order_by == 'data_evento_inicio' %}selected{% endif %}>Data</option>
+                <option value="nome_evento" {% if current_filters.order_by == 'nome_evento' %}selected{% endif %}>Nome do Evento</option>
+                <option value="preco" {% if current_filters.order_by == 'preco' %}selected{% endif %}>Preço</option>
+                <option value="cidade" {% if current_filters.order_by == 'cidade' %}selected{% endif %}>Cidade</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="order_direction">Direção:</label>
+            <select id="order_direction" name="order_direction">
+                <option value="ASC" {% if current_filters.order_direction == 'ASC' %}selected{% endif %}>Crescente (ASC)</option>
+                <option value="DESC" {% if current_filters.order_direction == 'DESC' %}selected{% endif %}>Decrescente (DESC)</option>
+            </select>
+        </div>
+        <button type="submit">Buscar Eventos</button>
+    </form>
+
+    <hr>
+
+    <h3>Resultados: {{ events|length }} evento(s) encontrado(s)</h3>
+    {% if events %}
+    <div class="event-list">
+        {% for event in events %}
+        <div class="event-card">
+            <h3><a href="{{ event.link_compra }}" target="_blank">{{ event.nome_evento }}</a></h3>
+            <p><strong>Artista:</strong> {{ event.nome_artista }}</p>
+            <p><strong>Data:</strong> {{ event.data_evento_inicio }}</p>
+            <p><strong>Local:</strong> {{ event.local }}, {{ event.cidade }} - {{ event.estado }}</p>
+            <p><strong>Preço:</strong> {{ event.preco }}</p>
+            <p><strong>Organizador:</strong> {{ event.organizador }}</p>
+            <p><strong>Tipo:</strong> {{ event.tipo_evento }} ({{ event.genero_musical }})</p>
+            {% if event.tipos_ingresso %}
+            <div class="ticket-details">
+                <h4>Ingressos Disponíveis:</h4>
+                <ul>
+                    {% for ticket in event.tipos_ingresso %}
+                    <li>
+                        {{ ticket.tipo }}: {{ ticket.valor_principal }} {{ ticket.taxa }}
+                        {% if ticket.valor_parcelado %} ({{ ticket.valor_parcelado }}) {% endif %}
+                        {% if ticket.data_limite_venda %} (Vendas até: {{ ticket.data_limite_venda }}) {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Nenhum evento encontrado com os filtros aplicados.</p>
+    {% endif %}
+{% endblock %}

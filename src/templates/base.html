@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Scraper de Eventos{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('index') }}">Scraper de Eventos Sympla</a></h1>
+        <nav>
+            <ul>
+                <li><a href="https://www.sympla.com.br/" target="_blank">Sympla</a></li>
+                <li><a href="https://github.com/SEU_USUARIO/SEU_REPOSITORIO" target="_blank">GitHub do Projeto</a></li>
+                </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; {{ now().year }} Scraper de Eventos. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Pequeno script JS para manter o valor do campo de data/texto/select após o envio
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                const paramValue = urlParams.get(input.name);
+                if (paramValue) {
+                    input.value = paramValue;
+                }
+            });
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                const paramValue = urlParams.get(input.name);
+                if (paramValue) {
+                    input.value = paramValue;
+                }
+            });
+            document.querySelectorAll('select').forEach(select => {
+                const paramValue = urlParams.get(select.name);
+                if (paramValue) {
+                    select.value = paramValue;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
